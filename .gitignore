@@ -1,1 +1,6 @@
-git rm -r --cached .env
+#dependencies
+/node_modules
+
+#secret
+.env
+
