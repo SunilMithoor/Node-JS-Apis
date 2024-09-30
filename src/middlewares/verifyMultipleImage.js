@@ -8,11 +8,16 @@ const { logger } = require("../logger/logger.js");
 const verifyLogger = logger("VerifyImage");
 
 const imageFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image")) {
-    cb(null, true);
-  } else {
+  // Check if the file starts with 'image' in its mimetype
+
+  // if (!file.originalname.match(/\.(png|jpeg|jpg)$/)) {
+  //   return callback(new Error("Please upload a Picture(PNG or JPEG)"));
+  // }
+  if (!file.mimetype.startsWith("image")) {
     cb(message.upload_only_images, false);
     return;
+  } else {
+    cb(null, true);
   }
 };
 
@@ -32,7 +37,7 @@ var storage = multer.diskStorage({
     // cb(null, uniqueSuffix + '-' + file.originalname); // Set a unique filename
 
     const dateTime = dateTimeUtils.giveCurrentDateTime();
-    const fileName = "Image_" + dateTime;
+    const fileName = "Image_" + dateTime + "_" + file.originalname;
     cb(null, fileName);
   },
 });
@@ -70,17 +75,6 @@ const multerErrorHandler = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     // Handle multer errors
     if (err.code === "LIMIT_FILE_SIZE") {
-      // Read the file from disk
-      // const filePath = req.file.path;
-      // // Delete the file from local storage once uploaded
-      // fs.unlink(filePath, (err) => {
-      //   if (err) {
-      //     verifyLogger.error(`Error deleting file: ${err}`);
-      //   } else {
-      //     verifyLogger.info(`File deleted from local storage: ${filePath}`);
-      //   }
-      // });
-
       return res
         .status(serverCode.badRequest)
         .send(

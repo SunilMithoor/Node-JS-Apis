@@ -21,5 +21,7 @@ module.exports = {
   unable_upload_image_url: "Unable to upload image url to database",
   file_size_error: "File is too large. Maximum size is 2MB.",
   unknown_error: "An unknown error occurred.",
-  file_upload_error:"An error occurred during the file upload."
+  file_upload_error:"An error occurred during the file upload.",
+  file_buffer_undefined:"File buffer is undefined",
+  file_deletion_failed:"File deletion failed",
 };

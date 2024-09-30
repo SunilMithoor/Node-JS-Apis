@@ -20,7 +20,7 @@ const User = db.user;
 const addUser = async (req, res) => {
   userLogger.info(`addUser request :: ${req.body}`);
   const checkUser = await User.findOne({
-    where: { user_name: req.body.user_name },
+    where: { userName: req.body.userName },
   });
   if (checkUser && checkUser.dataValues) {
     return res
@@ -36,19 +36,19 @@ const addUser = async (req, res) => {
     const salt = genSaltSync(10);
     var password = hashSync(req.body.password, salt);
     let info = {
-      user_name: req.body.user_name,
+      userName: req.body.userName,
       password: password,
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      fcm_token: req.body.fcm_token,
-      date_of_birth: req.body.date_of_birth ? req.body.date_of_birth : null,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      fcmToken: req.body.fcmToken,
+      dateOfBirth: req.body.dateOfBirth ? req.body.dateOfBirth : null,
     };
 
     const user = await User.create(info)
       .then((data) => {
         if (data) {
           const token = jwt.sign(
-            { user_id: data.user_id, user_name: data.user_name },
+            { userId: data.userId, userName: data.userName },
             process.env.JWT_SECRET_KEY,
             {
               expiresIn: process.env.JWT_EXPIRE,
@@ -126,8 +126,8 @@ const getAllUsers = async (req, res) => {
 // 3. get users by id
 
 const getUserById = async (req, res) => {
-  userLogger.info(`getUserById request :: ${req.user_id}`);
-  let users = await User.findOne({ where: { user_id: req.user_id } })
+  userLogger.info(`getUserById request :: ${req.userId}`);
+  let users = await User.findOne({ where: { userId: req.userId } })
     .then((data) => {
       if (data) {
         return res
@@ -168,8 +168,8 @@ const getUserById = async (req, res) => {
 
 // 4. delete user
 const deleteUser = async (req, res) => {
-  userLogger.info(`deleteUser request :: ${req.user_id}`);
-  let users = await User.destroy({ where: { user_id: req.user_id } })
+  userLogger.info(`deleteUser request :: ${req.userId}`);
+  let users = await User.destroy({ where: { userId: req.userId } })
     .then((data) => {
       if (data) {
         return res
@@ -212,14 +212,14 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
   userLogger.info(`updateUser request :: ${req.body}`);
   let info = {
-    user_name: req.body.user_name,
+    userName: req.body.userName,
     password: password,
-    first_name: req.body.first_name,
-    last_name: req.body.last_name,
-    fcm_token: req.body.fcm_token,
-    date_of_birth: req.body.date_of_birth ? req.body.date_of_birth : null,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    fcmToken: req.body.fcmToken,
+    dateOfBirth: req.body.dateOfBirth ? req.body.dateOfBirth : null,
   };
-  let users = await User.updateUser({ where: { user_id: id } })
+  let users = await User.updateUser({ where: { userId: id } })
     .then((data) => {
       if (data) {
         return res
@@ -263,11 +263,11 @@ const loginUser = async (req, res) => {
   userLogger.info(`loginUser request :: ${req.body}`);
   try {
     let info = {
-      user_name: req.body.user_name,
+      userName: req.body.userName,
       password: req.body.password,
     };
     const user = await User.findOne({
-      where: { user_name: req.body.user_name },
+      where: { userName: req.body.userName },
     });
     if (!user) {
       userLogger.error("User not found");
@@ -299,7 +299,7 @@ const loginUser = async (req, res) => {
         );
     }
     const token = jwt.sign(
-      { user_id: user.user_id, user_name: user.user_name },
+      { userId: user.userId, userName: user.userName },
       process.env.JWT_SECRET_KEY,
       {
         expiresIn: process.env.JWT_EXPIRE,
@@ -361,7 +361,7 @@ const logoutUser = async (req, res) => {
 
 const getUserData = async (req, res) => {
   userLogger.info(`getUserData request :: ${req.params}`);
-  await User.findOne({ where: { user_id: req.user_id } })
+  await User.findOne({ where: { userId: req.userId } })
     .then((data) => {
       if (data) {
         return res

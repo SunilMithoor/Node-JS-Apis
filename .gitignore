@@ -1,9 +1,19 @@
 #dependencies
 node_modules/
 
+# ignore log files
 *.logs
 logs/
 
+# ignore upload folder
+upload/
+
+# ignore  configs
+.firebase
+.configs
+
 #secret
 .env
+
+.idea
 

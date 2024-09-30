@@ -51,8 +51,8 @@ const verifyToken = (req, res, next) => {
             )
           );
       }
-      req.user_id = decoded.user_id;
-      authLogger.info(`UserId :: ${decoded.user_id}`);
+      req.userId = decoded.userId;
+      authLogger.info(`UserId :: ${decoded.userId}`);
       next();
     });
   } catch (err) {

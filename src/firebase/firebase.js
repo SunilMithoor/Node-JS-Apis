@@ -1,8 +1,13 @@
 const { initializeApp } = require("firebase/app");
-const firebaseConfig = require("../configs/firebaseConfig.js");
+const firebaseConfig = require("../config/firebaseConfig.js");
 
 const admin = require("firebase-admin");
-const serviceAccount = require("../configs/serviceAccountKey.json");
+
+const path = require("path");
+// Path to the service account key
+const serviceAccount = require(path.join(__dirname, "../../.firebase/serviceAccountKey.json"));
+
+// const serviceAccount = require("../../.firebase/serviceAccountKey.json");
 
 const config = {
   apiKey: firebaseConfig.FIREBASE_API_KEY,
@@ -17,9 +22,8 @@ const config = {
 const firebaseApp = initializeApp(config);
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-//   storageBucket: "gs://ecommerce-app-efcf0.appspot.com", // replace with your bucket name
-  storageBucket: firebaseConfig.FIREBASE_STORAGE_BUCKET,
+  credential: admin.credential.cert(serviceAccount), 
+  storageBucket: firebaseConfig.FIREBASE_STORAGE_BUCKET, // replace with your bucket name
 });
 
 const bucket = admin.storage().bucket();
