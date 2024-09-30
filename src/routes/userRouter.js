@@ -21,29 +21,29 @@ const router = require("express").Router();
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - userName
  *               - password
- *               - firstname
- *               - lastname
- *               - fcmtoken
- *               - dateofbirth
+ *               - firstName
+ *               - lastName
+ *               - fcmToken
+ *               - dateOfBirth
  *             properties:
- *               user_name:
+ *               userName:
  *                 type: string
  *                 default: sunil
  *               password:
  *                 type: string
  *                 default: sunil20!@
- *               first_name:
+ *               firstName:
  *                 type: string
  *                 default: sunil
- *               last_name:
+ *               lastName:
  *                 type: string
  *                 default: mg
- *               fcm_token:
+ *               fcmToken:
  *                 type: string
  *                 default: wergedwgwegweg
- *               date_of_birth:
+ *               dateOfBirth:
  *                 type: string
  *                 default: 2024-05-23
  *     responses:
@@ -73,10 +73,10 @@ router.post("/addUser", userController.addUser);
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - userName
  *               - password
  *             properties:
- *               user_name:
+ *               userName:
  *                 type: string
  *                 default: sunil
  *               password:

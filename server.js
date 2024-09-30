@@ -3,8 +3,11 @@ const cors = require("cors");
 const cookieSession = require("cookie-session");
 const dotenv = require("dotenv");
 const app = express();
-const { logger } = require('./src/logger/logger.js');
-const serverLogger = logger('Server');
+const { logger } = require("./src/logger/logger.js");
+const serverLogger = logger("Server");
+
+const http = require("http");
+const { createTerminus, HealthCheckError } = require("@godaddy/terminus");
 
 dotenv.config();
 
@@ -21,8 +24,8 @@ app.use(
 );
 
 // Use the combined router
-const router = require('./src/routes/mainRouter.js');
-app.use('/api', router);
+const router = require("./src/routes/mainRouter.js");
+app.use("/api", router);
 
 // swagger
 const swaggerDocs = require("./src/swagger/swagger.js");
@@ -37,8 +40,39 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to application." });
 });
 
+const server = http.createServer(app);
+
+
+createTerminus(server, {
+  healthChecks: {
+    "/healthcheck": async function () {
+      const errors = [];
+      return Promise.all(
+        [
+          // all your health checks goes here
+        ].map((p) =>
+          p.catch((error) => {
+            // silently collecting all the errors
+            errors.push(error);
+            return undefined;
+          })
+        )
+      ).then(() => {
+        if (errors.length) {
+          throw new HealthCheckError("Healthcheck failed", errors);
+        }
+      });
+    },
+  },
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
+  },
+});
+
+
 //server
-app.listen(PORT, function (err) {
+app.listen(PORT || 3000, function (err) {
   if (err) {
     serverLogger.error("Error: Error in server setup");
     return;
@@ -46,19 +80,3 @@ app.listen(PORT, function (err) {
   swaggerDocs(app, PORT);
   serverLogger.info(`Server listening on port: ${PORT}`);
 });
-
-// const server = app.listen(PORT);
-
-// server.on('error', function (err) {
-//   if (err.code === 'EADDRINUSE') {
-//     serverLogger.error(`Port ${PORT} is already in use. Please free the port or use a different one.`);
-//     process.exit(1);  // Exit the process if the port is already in use
-//   } else {
-//     serverLogger.error(`Server error: ${err.message}`);
-//   }
-// });
-
-// server.on('listening', function () {
-//   swaggerDocs(app, PORT);  // Initialize Swagger docs
-//   serverLogger.info(`Server listening on port: ${PORT}`);
-// });

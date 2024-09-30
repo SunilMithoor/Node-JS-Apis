@@ -2,6 +2,8 @@
 const imageController = require("../controllers/imageController.js");
 const authJwt = require("../middlewares/authJwt.js");
 const verifyImage = require("../middlewares/verifyImage.js");
+const verifyMultipleImage = require("../middlewares/verifyMultipleImage.js");
+
 
 // router
 const router = require("express").Router();
@@ -46,45 +48,45 @@ router.post(
   imageController.uploadImage
 );
 
-// /**
-//  * @openapi
-//  * /api/images/uploadMultipleImage:
-//  *   post:
-//  *     tags:
-//  *       - Image Controller
-//  *     summary: Upload Multiple Images
-//  *     security:
-//  *       - Authorization: []
-//  *     requestBody:
-//  *       required: true
-//  *       content:
-//  *         multipart/form-data:
-//  *           schema:
-//  *             type: object
-//  *             properties:
-//  *               files:
-//  *                 type: array
-//  *                 items:
-//  *                   type: string
-//  *                   format: binary
-//  *                   description: Array of image files to upload
-//  *     responses:
-//  *       200:
-//  *         description: Images uploaded successfully
-//  *       409:
-//  *         description: Conflict
-//  *       404:
-//  *         description: Not Found
-//  *       500:
-//  *         description: Server Error
-//  */
+/**
+ * @openapi
+ * /api/images/uploadMultipleImage:
+ *   post:
+ *     tags:
+ *       - Image Controller
+ *     summary: Upload Multiple Images
+ *     security:
+ *       - Authorization: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                   description: Array of image files to upload
+ *     responses:
+ *       200:
+ *         description: Images uploaded successfully
+ *       409:
+ *         description: Conflict
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Server Error
+ */
 
-// router.post(
-//   "/uploadMultipleImage",
-//   authJwt.verifyToken,
-//   verifyImage.uploadFile.array("files",5),
-//   verifyImage.multerErrorHandler,
-//   imageController.uploadImage
-// );
+router.post(
+  "/uploadMultipleImage",
+  authJwt.verifyToken,
+  verifyMultipleImage.uploadFile.array("files",5),
+  verifyMultipleImage.multerErrorHandler,
+  imageController.uploadMultipleImage
+);
 
 module.exports = router;

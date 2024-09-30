@@ -13,7 +13,7 @@ const {
 } = require("firebase/storage");
 const multer = require("multer");
 const dateTimeUtils = require("../utils/dateTimeUtils.js");
-const firebase = require('../firebase/firebase.js');
+const firebase = require("../firebase/firebase.js");
 
 // create main Model
 // const Images = db.images;
@@ -50,7 +50,7 @@ const uploadImage = async (req, res, err) => {
       size: ${req.file.size} bytes, 
       path: ${req.file.path}`);
 
-    const userId = req.user_id; // Extract the userId from the decoded token
+    const userId = req.userId; // Extract the userId from the decoded token
     imageLogger.info(`User ID: ${userId}`); // Log the userId for debugging
 
     //Store file in db using blob and local storage
@@ -124,7 +124,7 @@ const uploadImage = async (req, res, err) => {
     // Update the user table with the new image URL
     const users = await User.update(
       { image: downloadURL }, // Set the image column to the new URL
-      { where: { user_id: userId } } // Update where user ID matches
+      { where: { userId: userId } } // Update where user ID matches
     );
 
     if (users[0] === 0) {
@@ -173,103 +173,113 @@ const uploadImage = async (req, res, err) => {
   }
 };
 
-// //2. Multiple Upload Images
+//2. Multiple Upload Images
 
-// const uploadMultipleImage = async (req, res, err) => {
-//   try {
-//     imageLogger.info(`multipleUploadImage request`);
-//     if (req.file == undefined) {
-//       return res
-//         .status(serverCode.badRequest)
-//         .send(
-//           apiResponse.serverErrorJsonObject(
-//             res.statusCode,
-//             false,
-//             message.select_file
-//           )
-//         );
-//     }
+const uploadMultipleImage = async (req, res, err) => {
+  try {
+    imageLogger.info(`multipleUploadImage request`);
+    if (
+      req.files == undefined ||
+      !req.files ||
+      Object.keys(req.files).length === 0
+    ) {
+      return res
+        .status(serverCode.badRequest)
+        .send(
+          apiResponse.serverErrorJsonObject(
+            res.statusCode,
+            false,
+            message.select_file
+          )
+        );
+    }
 
-//     imageLogger.info(`Image file details: 
-//       filename: ${req.file.filename}, 
-//       originalname: ${req.file.originalname}, 
-//       mimetype: ${req.file.mimetype}, 
-//       size: ${req.file.size} bytes, 
-//       path: ${req.file.path}`);
+    const userId = req.userId; // Extract the userId from the decoded token
+    imageLogger.info(`User ID: ${userId}`); // Log the userId for debugging
 
-//     const userId = req.user_id; // Extract the userId from the decoded token
-//     imageLogger.info(`User ID: ${userId}`); // Log the userId for debugging
+    const uploadPromises = [];
+    const files = req.files;
+    imageLogger.info(`files: ${files}`);
 
-//     //Store file in firebase datastore
+    const bucket = firebase.bucket;
 
-//     const files = req.files;
-//     const promises = [];
+    files.forEach((file) => {
+      imageLogger.info(`Image file details: 
+        filename: ${file.filename}, 
+        originalname: ${file.originalname}, 
+        mimetype: ${file.mimetype}, 
+        size: ${file.size} bytes, 
+        path: ${file.path}`);
 
-//     files.forEach(file => {
-//       const blob = bucket.file(Date.now() + '-' + file.originalname);
-//       const blobStream = blob.createWriteStream({
-//         metadata: {
-//           contentType: file.mimetype
-//         }
-//       });
+      const dateTime = dateTimeUtils.giveCurrentDateTime();
+      const folderName = "users/" + userId + "/images/";
+      const fileName = "Image_" + dateTime + "_" + file.originalname;
+      const blob = bucket.file(folderName + fileName);
+     
+      const blobStream = blob.createWriteStream({
+        metadata: {
+          contentType: file.mimetype,
+        },
+      });
 
-//       blobStream.end(file.buffer);
+      uploadPromises.push(
+        new Promise((resolve, reject) => {
+          blobStream.on("error", (error) => {
+            imageLogger.info(`Error: ${error}`);
+            reject(error); // Reject the promise on error
+          });
 
-//       promises.push(new Promise((resolve, reject) => {
-//         blobStream.on('finish', () => {
-//           blob.getSignedUrl({
-//             action: 'read',
-//             expires: '03-09-2491' // link expiration
-//           }).then((url) => {
-//             resolve(url[0]); // push the URL to resolve on success
-//           }).catch(reject);
-//         });
+          blobStream.on("finish", () => {
+            blob
+              .getSignedUrl({
+                action: "read",
+                expires: "03-01-2500", // link expiration
+              })
+              .then((url) => {
+                resolve(url[0]); // push the URL to resolve on success
+                imageLogger.info(`Url success: ${url}`);
+              })
+              .catch((error) => {
+                imageLogger.info(`Error: ${error}`);
+                reject(error); // Reject on error in getting signed URL
+              });
+          });
+          // Write the buffer to the blob stream and end the stream
+          blobStream.end(file.buffer); // Ensure the buffer is passed here
+        })
+      );
+    });
 
-//         blobStream.on('error', reject);
-//       }));
-//     });
+    const urls = await Promise.all(uploadPromises);
+    imageLogger.info(`DownloadUrl  :: ${urls}`);
 
-//     const urls = await Promise.all(promises);
- 
-  
-//     imageLogger.info(`DownloadUrl  :: ${urls}`);
+    
 
-  
-
-//     // Delete the file from local storage once uploaded
-//     // fs.unlink(filePath, (err) => {
-//     //   if (err) {
-//     //     imageLogger.error(`Error deleting file: ${err}`);
-//     //   } else {
-//     //     imageLogger.info(`File deleted from local storage: ${filePath}`);
-//     //   }
-//     // });
-
-//     return res
-//       .status(serverCode.ok)
-//       .send(
-//         apiResponse.successJsonObject(
-//           res.statusCode,
-//           true,
-//           message.uploaded_to_firebase,
-//           downloadURL
-//         )
-//       );
-//   } catch (err) {
-//     imageLogger.error(`error  :: ${err}`);
-//     return res
-//       .status(serverCode.notFound)
-//       .send(
-//         apiResponse.serverErrorJsonObject(
-//           res.statusCode,
-//           false,
-//           message.server_error
-//         )
-//       );
-//   }
-// };
+    return res
+      .status(serverCode.ok)
+      .send(
+        apiResponse.successJsonObject(
+          res.statusCode,
+          true,
+          message.uploaded_to_firebase,
+          urls
+        )
+      );
+  } catch (err) {
+    imageLogger.error(`error  :: ${err}`);
+    return res
+      .status(serverCode.notFound)
+      .send(
+        apiResponse.serverErrorJsonObject(
+          res.statusCode,
+          false,
+          message.server_error
+        )
+      );
+  }
+};
 
 module.exports = {
   uploadImage,
-  // uploadMultipleImage,
+  uploadMultipleImage,
 };
