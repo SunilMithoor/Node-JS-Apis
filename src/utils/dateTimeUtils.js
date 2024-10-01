@@ -1,4 +1,4 @@
-const { logger } = require("../logger/logger.js");
+const { logger } = require("../libs/logger.js");
 const utilLogger = logger("DateTimeUtils");
 
 function giveCurrentDateTime() {

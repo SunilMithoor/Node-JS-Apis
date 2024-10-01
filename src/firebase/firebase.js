@@ -1,13 +1,12 @@
 const { initializeApp } = require("firebase/app");
-const firebaseConfig = require("../config/firebaseConfig.js");
+const firebaseConfig = require("../../config/firebaseConfig.js");
 
 const admin = require("firebase-admin");
 
 const path = require("path");
 // Path to the service account key
-const serviceAccount = require(path.join(__dirname, "../../.firebase/serviceAccountKey.json"));
+const serviceAccount = require(path.join(__dirname, "../../firebase/serviceAccountKey.json"));
 
-// const serviceAccount = require("../../.firebase/serviceAccountKey.json");
 
 const config = {
   apiKey: firebaseConfig.FIREBASE_API_KEY,

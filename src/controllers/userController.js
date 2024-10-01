@@ -1,4 +1,4 @@
-const db = require("../models/index.js");
+const db = require("../../models/index.js");
 const message = require("../constants/message.js");
 const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
@@ -7,8 +7,10 @@ const { genSaltSync, hashSync } = require("bcrypt");
 const bcrypt = require("bcryptjs");
 //npm i jsonwebtoken // install package for jsonwebtoken
 const jwt = require("jsonwebtoken");
-const { logger } = require("../logger/logger.js");
+const { logger } = require("../libs/logger.js");
 const userLogger = logger("User");
+const moment = require('moment');
+const date = new Date();
 
 // create main Model
 const User = db.user;
