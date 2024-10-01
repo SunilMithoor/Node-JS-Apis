@@ -1,15 +1,20 @@
 const firebase = require("../firebase/firebase.js");
 const bucket = firebase.bucket;
 const fs = require("fs");
-const { logger } = require("../logger/logger.js");
+const { logger } = require("../libs/logger.js");
 const fileLogger = logger("Files");
 const dateTimeUtils = require("../utils/dateTimeUtils.js");
 const shortid = require("shortid");
 const message = require("../constants/message.js");
 const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
+const db = require("../../models/index.js");
+const moment = require('moment');
+const date = new Date();
 
-async function uploadImage(file,req) {
+const Images = db.images;
+
+async function uploadImage(file, req) {
   try {
     if (!file) {
       return apiResponse.failureJsonObject(
@@ -40,25 +45,49 @@ async function uploadImage(file,req) {
         message.file_buffer_undefined
       );
     }
+    const fileType = file.mimetype;
+    // const dateTime = dateTimeUtils.giveCurrentDateTime();
+    const dateTime = moment(date).format('YYYY-MM-DD_HH:mm:ss'); 
+    const folderName = `users/` + userId + `/images/`;
+    const fileName = `${"Image_" + dateTime}${
+      "_" + shortid.generate()
+    }.${file.originalname.split(".").pop()}`;
 
-
-    const dateTime = dateTimeUtils.giveCurrentDateTime();
-    const fileName =
-      `users/` +
-      userId +
-      `/images/${"Image_" + dateTime}${
-        "_" + shortid.generate()
-      }.${file.originalname.split(".").pop()}`;
-
+    // const fileName =
+    //   `users/` +
+    //   userId +
+    //   `/images/${"Image_" + dateTime}${
+    //     "_" + shortid.generate()
+    //   }.${file.originalname.split(".").pop()}`;
 
     // Save file to Firebase Storage
-    await bucket.file(fileName).save(fileBuffer, { resumable: true });
+    await bucket
+      .file(folderName + fileName)
+      .save(fileBuffer, { resumable: true });
 
     // Generate signed URL after successful upload
-    const [url] = await bucket.file(fileName).getSignedUrl({
+    const [url] = await bucket.file(folderName + fileName).getSignedUrl({
       action: "read",
       expires: "03-01-2500",
     });
+
+    // Insert the new files into the Files table
+    const fileRecord = await Images.create({
+      userId: userId,
+      name: fileName,
+      fileType: fileType,
+      filePath: url,
+      module: "none",
+    });
+
+    if (fileRecord[0] === 0) {
+      // Check if the update was successful
+      return apiResponse.failureJsonObject(
+        serverCode.notFound,
+        false,
+        message.unable_upload_image_url
+      );
+    }
 
     // Delete the local file after successful upload
     fs.unlink(file.path, (err) => {
@@ -83,7 +112,7 @@ async function uploadImage(file,req) {
   }
 }
 
-const addMultipleImages = async (req, res, next) => {
+const addMultipleImages = async (req, res) => {
   try {
     const files = req.files;
     if (!files || files.length === 0) {

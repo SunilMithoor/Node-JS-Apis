@@ -4,7 +4,7 @@ const message = require("../constants/message.js");
 const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
 const dateTimeUtils = require("../utils/dateTimeUtils.js");
-const { logger } = require("../logger/logger.js");
+const { logger } = require("../libs/logger.js");
 const verifyLogger = logger("VerifyImage");
 
 const imageFilter = (req, file, cb) => {
@@ -22,7 +22,7 @@ const imageFilter = (req, file, cb) => {
 };
 
 // Ensure 'uploads/' directory exists
-const uploadDir = "./upload/images";
+const uploadDir = "./tmp/images";
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true }); // Creates the folder if it doesn't exist
 }

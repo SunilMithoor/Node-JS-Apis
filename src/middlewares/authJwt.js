@@ -1,10 +1,8 @@
-const db = require("../models");
 const message = require("../constants/message.js");
 const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
 const jwt = require("jsonwebtoken");
-const user = db.user;
-const { logger } = require("../logger/logger.js");
+const { logger } = require("../libs/logger.js");
 const authLogger = logger("Auth");
 
 const verifyToken = (req, res, next) => {

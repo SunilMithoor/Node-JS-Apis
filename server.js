@@ -3,7 +3,7 @@ const cors = require("cors");
 const cookieSession = require("cookie-session");
 const dotenv = require("dotenv");
 const app = express();
-const { logger } = require("./src/logger/logger.js");
+const { logger } = require("./src/libs/logger.js");
 const serverLogger = logger("Server");
 
 const http = require("http");
@@ -28,7 +28,7 @@ const router = require("./src/routes/mainRouter.js");
 app.use("/api", router);
 
 // swagger
-const swaggerDocs = require("./src/swagger/swagger.js");
+const swaggerDocs = require("./src/libs/swagger.js");
 
 //port
 const { DB_PORT } = process.env;

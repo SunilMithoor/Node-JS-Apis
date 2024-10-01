@@ -6,14 +6,22 @@ node_modules/
 logs/
 
 # ignore upload folder
-upload/
+tmp/
 
 # ignore  configs
-.firebase
-.configs
+firebase/
+config/
+migrations/
 
 #secret
 .env
 
+# ignore  vscode
+.vscode/
+
+# ignore  idea
 .idea
+
+# ignore  idea
+.eslint.config.mjs
 

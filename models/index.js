@@ -1,6 +1,6 @@
 const dbConfig = require("../config/dbConfig.js");
 const { Sequelize, DataTypes } = require("sequelize");
-const { logger } = require("../logger/logger.js");
+const { logger } = require("../src/libs/logger.js");
 const serverLogger = logger("Server");
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
@@ -30,8 +30,8 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.user = require("./userModel.js")(sequelize, DataTypes);
-db.images = require("./imagesModel.js")(sequelize, DataTypes);
+db.user = require("../src/models/userModel.js")(sequelize, DataTypes);
+db.images = require("../src/models/imagesModel.js")(sequelize, DataTypes);
 
 db.sequelize
   .sync({ force: false })

@@ -1,8 +1,8 @@
-const db = require("../models/index.js");
+const db = require("../../models/index.js");
 const message = require("../constants/message.js");
 const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
-const { logger } = require("../logger/logger.js");
+const { logger } = require("../libs/logger.js");
 const imageLogger = logger("Images");
 const fs = require("fs");
 const {
@@ -11,24 +11,23 @@ const {
   getDownloadURL,
   uploadBytesResumable,
 } = require("firebase/storage");
-const multer = require("multer");
 const dateTimeUtils = require("../utils/dateTimeUtils.js");
 const firebase = require("../firebase/firebase.js");
+const moment = require('moment');
+const date = new Date();
 
 // create main Model
 // const Images = db.images;
 
 const User = db.user;
 
+
 // Initialize Cloud Storage and get a reference to the service
 const storage = getStorage();
 
-// Setting up multer as a middleware to grab photo uploads
-const upload = multer({ storage: multer.memoryStorage() });
-
 // 1. Upload Image
 
-const uploadImage = async (req, res, err) => {
+const uploadImage = async (req, res) => {
   try {
     imageLogger.info(`uploadImage request`);
     if (req.file == undefined) {
@@ -92,7 +91,8 @@ const uploadImage = async (req, res, err) => {
     const filePath = req.file.path;
     const fileBuffer = fs.readFileSync(filePath);
 
-    const dateTime = dateTimeUtils.giveCurrentDateTime();
+    // const dateTime = dateTimeUtils.giveCurrentDateTime();
+    const dateTime = moment(date).format('YYYY-MM-DD_HH:mm:ss'); 
     // const storageRef = ref(storage, `userId/images/${"Image_" + dateTime}`);
     const storageRef = ref(
       storage,
@@ -123,7 +123,7 @@ const uploadImage = async (req, res, err) => {
 
     // Update the user table with the new image URL
     const users = await User.update(
-      { image: downloadURL }, // Set the image column to the new URL
+      { imageUrl: downloadURL }, // Set the image column to the new URL
       { where: { userId: userId } } // Update where user ID matches
     );
 
@@ -175,7 +175,7 @@ const uploadImage = async (req, res, err) => {
 
 //2. Multiple Upload Images
 
-const uploadMultipleImage = async (req, res, err) => {
+const uploadMultipleImage = async (req, res) => {
   try {
     imageLogger.info(`multipleUploadImage request`);
     if (
@@ -211,7 +211,8 @@ const uploadMultipleImage = async (req, res, err) => {
         size: ${file.size} bytes, 
         path: ${file.path}`);
 
-      const dateTime = dateTimeUtils.giveCurrentDateTime();
+      // const dateTime = dateTimeUtils.giveCurrentDateTime();
+      const dateTime = moment(date).format('YYYY-MM-DD_HH:mm:ss'); 
       const folderName = "users/" + userId + "/images/";
       const fileName = "Image_" + dateTime + "_" + file.originalname;
       const blob = bucket.file(folderName + fileName);
