@@ -24,4 +24,5 @@ module.exports = {
   file_upload_error:"An error occurred during the file upload.",
   file_buffer_undefined:"File buffer is undefined",
   file_deletion_failed:"File deletion failed",
+  check_input_data:"Please check the input data",
 };

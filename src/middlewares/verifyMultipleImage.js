@@ -5,7 +5,7 @@ const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
 const dateTimeUtils = require("../utils/dateTimeUtils.js");
 const { logger } = require("../libs/logger.js");
-const verifyLogger = logger("VerifyImage");
+const appLogger = logger("VerifyImage");
 
 const imageFilter = (req, file, cb) => {
   // Check if the file starts with 'image' in its mimetype
@@ -71,7 +71,7 @@ var uploadFile = multer({
 
 // Custom error handling middleware
 const multerErrorHandler = (err, req, res, next) => {
-  verifyLogger.error(`error  :: ${err}`);
+  appLogger.error(`error  :: ${err}`);
   if (err instanceof multer.MulterError) {
     // Handle multer errors
     if (err.code === "LIMIT_FILE_SIZE") {

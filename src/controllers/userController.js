@@ -8,9 +8,8 @@ const bcrypt = require("bcryptjs");
 //npm i jsonwebtoken // install package for jsonwebtoken
 const jwt = require("jsonwebtoken");
 const { logger } = require("../libs/logger.js");
-const userLogger = logger("User");
-const moment = require('moment');
-const date = new Date();
+const appLogger = logger("User");
+
 
 // create main Model
 const User = db.user;
@@ -20,7 +19,7 @@ const User = db.user;
 // 1. create user
 
 const addUser = async (req, res) => {
-  userLogger.info(`addUser request :: ${req.body}`);
+  appLogger.info(`addUser request :: ${req.body}`);
   const checkUser = await User.findOne({
     where: { userName: req.body.userName },
   });
@@ -80,7 +79,7 @@ const addUser = async (req, res) => {
         }
       })
       .catch((err) => {
-        userLogger.error(`error  :: ${err}`);
+        appLogger.error(`error  :: ${err}`);
         return res
           .status(serverCode.notFound)
           .send(
@@ -97,7 +96,7 @@ const addUser = async (req, res) => {
 // 2. get all users
 
 const getAllUsers = async (req, res) => {
-  userLogger.info("getAllUsers request :: ");
+  appLogger.info("getAllUsers request :: ");
   let users = await User.findAll({})
     .then((data) => {
       return res
@@ -112,7 +111,7 @@ const getAllUsers = async (req, res) => {
         );
     })
     .catch((err) => {
-      userLogger.error(`error  :: ${err}`);
+      appLogger.error(`error  :: ${err}`);
       return res
         .status(serverCode.notFound)
         .send(
@@ -128,7 +127,7 @@ const getAllUsers = async (req, res) => {
 // 3. get users by id
 
 const getUserById = async (req, res) => {
-  userLogger.info(`getUserById request :: ${req.userId}`);
+  appLogger.info(`getUserById request :: ${req.userId}`);
   let users = await User.findOne({ where: { userId: req.userId } })
     .then((data) => {
       if (data) {
@@ -155,7 +154,7 @@ const getUserById = async (req, res) => {
       }
     })
     .catch((err) => {
-      userLogger.error(`error  :: ${err}`);
+      appLogger.error(`error  :: ${err}`);
       return res
         .status(serverCode.notFound)
         .send(
@@ -170,7 +169,7 @@ const getUserById = async (req, res) => {
 
 // 4. delete user
 const deleteUser = async (req, res) => {
-  userLogger.info(`deleteUser request :: ${req.userId}`);
+  appLogger.info(`deleteUser request :: ${req.userId}`);
   let users = await User.destroy({ where: { userId: req.userId } })
     .then((data) => {
       if (data) {
@@ -197,7 +196,7 @@ const deleteUser = async (req, res) => {
       }
     })
     .catch((err) => {
-      userLogger.error(`error  :: ${err}`);
+      appLogger.error(`error  :: ${err}`);
       return res
         .status(serverCode.notFound)
         .send(
@@ -212,7 +211,7 @@ const deleteUser = async (req, res) => {
 
 // 5. update user
 const updateUser = async (req, res) => {
-  userLogger.info(`updateUser request :: ${req.body}`);
+  appLogger.info(`updateUser request :: ${req.body}`);
   let info = {
     userName: req.body.userName,
     password: password,
@@ -247,7 +246,7 @@ const updateUser = async (req, res) => {
       }
     })
     .catch((err) => {
-      userLogger.error(`error  :: ${err}`);
+      appLogger.error(`error  :: ${err}`);
       return res
         .status(serverCode.notFound)
         .send(
@@ -262,7 +261,7 @@ const updateUser = async (req, res) => {
 
 // 6. login user
 const loginUser = async (req, res) => {
-  userLogger.info(`loginUser request :: ${req.body}`);
+  appLogger.info(`loginUser request :: ${req.body}`);
   try {
     let info = {
       userName: req.body.userName,
@@ -272,7 +271,7 @@ const loginUser = async (req, res) => {
       where: { userName: req.body.userName },
     });
     if (!user) {
-      userLogger.error("User not found");
+      appLogger.error("User not found");
       return res
         .status(serverCode.notFound)
         .send(
@@ -283,13 +282,13 @@ const loginUser = async (req, res) => {
           )
         );
     }
-    userLogger.info(`user :: ${user}`);
+    appLogger.info(`user :: ${user}`);
     const passwordIsValid = bcrypt.compareSync(
       req.body.password,
       user.password
     );
     if (!passwordIsValid) {
-      userLogger.error("Invalid password");
+      appLogger.error("Invalid password");
       return res
         .status(serverCode.unAuthorized)
         .send(
@@ -309,7 +308,7 @@ const loginUser = async (req, res) => {
       }
     );
     // req.session.token = token;
-    userLogger.info(`token :: ${token}`);
+    appLogger.info(`token :: ${token}`);
     // var data = {
     //     user_data: user,
     //     token: token
@@ -325,7 +324,7 @@ const loginUser = async (req, res) => {
         )
       );
   } catch (err) {
-    userLogger.error(`error  :: ${err}`);
+    appLogger.error(`error  :: ${err}`);
     res
       .status(serverCode.notFound)
       .send(
@@ -336,7 +335,7 @@ const loginUser = async (req, res) => {
 
 // 7. logout user
 const logoutUser = async (req, res) => {
-  userLogger.info(`logoutUser request :: ${req.body}`);
+  appLogger.info(`logoutUser request :: ${req.body}`);
   try {
     // req.session = null;
     return res
@@ -350,7 +349,7 @@ const logoutUser = async (req, res) => {
         )
       );
   } catch (err) {
-    userLogger.error(`error  :: ${err}`);
+    appLogger.error(`error  :: ${err}`);
     res
       .status(serverCode.notFound)
       .send(
@@ -362,7 +361,7 @@ const logoutUser = async (req, res) => {
 // 8. get user data
 
 const getUserData = async (req, res) => {
-  userLogger.info(`getUserData request :: ${req.params}`);
+  appLogger.info(`getUserData request :: ${req.params}`);
   await User.findOne({ where: { userId: req.userId } })
     .then((data) => {
       if (data) {
@@ -389,7 +388,7 @@ const getUserData = async (req, res) => {
       }
     })
     .catch((err) => {
-      userLogger.error(`error  :: ${err}`);
+      appLogger.error(`error  :: ${err}`);
       return res
         .status(serverCode.notFound)
         .send(

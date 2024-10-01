@@ -5,7 +5,7 @@ const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
 const dateTimeUtils = require("../utils/dateTimeUtils.js");
 const { logger } = require("../libs/logger.js");
-const verifyLogger = logger("VerifyImage");
+const appLogger = logger("VerifyImage");
 
 const imageFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) {
@@ -66,7 +66,7 @@ var uploadFile = multer({
 
 // Custom error handling middleware
 const multerErrorHandler = (err, req, res, next) => {
-  verifyLogger.error(`error  :: ${err}`);
+  appLogger.error(`error  :: ${err}`);
   if (err instanceof multer.MulterError) {
     // Handle multer errors
     if (err.code === "LIMIT_FILE_SIZE") {
@@ -75,9 +75,9 @@ const multerErrorHandler = (err, req, res, next) => {
       // // Delete the file from local storage once uploaded
       // fs.unlink(filePath, (err) => {
       //   if (err) {
-      //     verifyLogger.error(`Error deleting file: ${err}`);
+      //     appLogger.error(`Error deleting file: ${err}`);
       //   } else {
-      //     verifyLogger.info(`File deleted from local storage: ${filePath}`);
+      //     appLogger.info(`File deleted from local storage: ${filePath}`);
       //   }
       // });
 

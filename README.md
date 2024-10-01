@@ -4,8 +4,8 @@
 
 <!-- environment -->
 NODE_ENV = development
-# NODE_ENV = stage
-# NODE_ENV = production
+<!-- NODE_ENV = stage -->
+<!-- NODE_ENV = production -->
 
 <!-- cookie -->
 COOKIE_SESSION_NAME = session name

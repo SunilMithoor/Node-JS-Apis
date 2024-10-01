@@ -3,7 +3,7 @@ const message = require("../constants/message.js");
 const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
 const { logger } = require("../libs/logger.js");
-const imageLogger = logger("Images");
+const appLogger = logger("Images");
 const fs = require("fs");
 const {
   getStorage,
@@ -11,7 +11,6 @@ const {
   getDownloadURL,
   uploadBytesResumable,
 } = require("firebase/storage");
-const dateTimeUtils = require("../utils/dateTimeUtils.js");
 const firebase = require("../firebase/firebase.js");
 const moment = require('moment');
 const date = new Date();
@@ -29,7 +28,7 @@ const storage = getStorage();
 
 const uploadImage = async (req, res) => {
   try {
-    imageLogger.info(`uploadImage request`);
+    appLogger.info(`uploadImage request`);
     if (req.file == undefined) {
       return res
         .status(serverCode.badRequest)
@@ -42,7 +41,7 @@ const uploadImage = async (req, res) => {
         );
     }
 
-    imageLogger.info(`Image file details: 
+    appLogger.info(`Image file details: 
       filename: ${req.file.filename}, 
       originalname: ${req.file.originalname}, 
       mimetype: ${req.file.mimetype}, 
@@ -50,7 +49,7 @@ const uploadImage = async (req, res) => {
       path: ${req.file.path}`);
 
     const userId = req.userId; // Extract the userId from the decoded token
-    imageLogger.info(`User ID: ${userId}`); // Log the userId for debugging
+    appLogger.info(`User ID: ${userId}`); // Log the userId for debugging
 
     //Store file in db using blob and local storage
 
@@ -119,7 +118,7 @@ const uploadImage = async (req, res) => {
     // Grab the public url
     const downloadURL = await getDownloadURL(snapshot.ref);
 
-    imageLogger.info(`DownloadUrl  :: ${downloadURL}`);
+    appLogger.info(`DownloadUrl  :: ${downloadURL}`);
 
     // Update the user table with the new image URL
     const users = await User.update(
@@ -143,9 +142,9 @@ const uploadImage = async (req, res) => {
     // Delete the file from local storage once uploaded
     fs.unlink(filePath, (err) => {
       if (err) {
-        imageLogger.error(`Error deleting file: ${err}`);
+        appLogger.error(`Error deleting file: ${err}`);
       } else {
-        imageLogger.info(`File deleted from local storage: ${filePath}`);
+        appLogger.info(`File deleted from local storage: ${filePath}`);
       }
     });
 
@@ -160,7 +159,7 @@ const uploadImage = async (req, res) => {
         )
       );
   } catch (err) {
-    imageLogger.error(`error  :: ${err}`);
+    appLogger.error(`error  :: ${err}`);
     return res
       .status(serverCode.notFound)
       .send(
@@ -177,7 +176,7 @@ const uploadImage = async (req, res) => {
 
 const uploadMultipleImage = async (req, res) => {
   try {
-    imageLogger.info(`multipleUploadImage request`);
+    appLogger.info(`multipleUploadImage request`);
     if (
       req.files == undefined ||
       !req.files ||
@@ -195,16 +194,16 @@ const uploadMultipleImage = async (req, res) => {
     }
 
     const userId = req.userId; // Extract the userId from the decoded token
-    imageLogger.info(`User ID: ${userId}`); // Log the userId for debugging
+    appLogger.info(`User ID: ${userId}`); // Log the userId for debugging
 
     const uploadPromises = [];
     const files = req.files;
-    imageLogger.info(`files: ${files}`);
+    appLogger.info(`files: ${files}`);
 
     const bucket = firebase.bucket;
 
     files.forEach((file) => {
-      imageLogger.info(`Image file details: 
+      appLogger.info(`Image file details: 
         filename: ${file.filename}, 
         originalname: ${file.originalname}, 
         mimetype: ${file.mimetype}, 
@@ -226,7 +225,7 @@ const uploadMultipleImage = async (req, res) => {
       uploadPromises.push(
         new Promise((resolve, reject) => {
           blobStream.on("error", (error) => {
-            imageLogger.info(`Error: ${error}`);
+            appLogger.info(`Error: ${error}`);
             reject(error); // Reject the promise on error
           });
 
@@ -238,10 +237,10 @@ const uploadMultipleImage = async (req, res) => {
               })
               .then((url) => {
                 resolve(url[0]); // push the URL to resolve on success
-                imageLogger.info(`Url success: ${url}`);
+                appLogger.info(`Url success: ${url}`);
               })
               .catch((error) => {
-                imageLogger.info(`Error: ${error}`);
+                appLogger.info(`Error: ${error}`);
                 reject(error); // Reject on error in getting signed URL
               });
           });
@@ -252,7 +251,7 @@ const uploadMultipleImage = async (req, res) => {
     });
 
     const urls = await Promise.all(uploadPromises);
-    imageLogger.info(`DownloadUrl  :: ${urls}`);
+    appLogger.info(`DownloadUrl  :: ${urls}`);
 
     
 
@@ -267,7 +266,7 @@ const uploadMultipleImage = async (req, res) => {
         )
       );
   } catch (err) {
-    imageLogger.error(`error  :: ${err}`);
+    appLogger.error(`error  :: ${err}`);
     return res
       .status(serverCode.notFound)
       .send(

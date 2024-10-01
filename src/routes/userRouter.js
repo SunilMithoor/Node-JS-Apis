@@ -3,6 +3,7 @@ const userController = require("../controllers/userController.js");
 const authJwt = require("../middlewares/authJwt.js");
 // router
 const router = require("express").Router();
+const validator = require("../middlewares//validators/validator.js");
 
 // use routers
 
@@ -92,7 +93,11 @@ router.post("/addUser", userController.addUser);
  *       500:
  *         description: Server Error
  */
-router.post("/loginUser", userController.loginUser);
+router.post(
+  "/loginUser",
+  validator("user.loginSchema"),
+  userController.loginUser
+);
 
 /** GET Methods */
 /**

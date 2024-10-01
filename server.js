@@ -4,7 +4,7 @@ const cookieSession = require("cookie-session");
 const dotenv = require("dotenv");
 const app = express();
 const { logger } = require("./src/libs/logger.js");
-const serverLogger = logger("Server");
+const appLogger = logger("Server");
 
 const http = require("http");
 const { createTerminus, HealthCheckError } = require("@godaddy/terminus");
@@ -36,12 +36,11 @@ const PORT = process.env.PORT || DB_PORT;
 
 // welcome message
 app.get("/", (req, res) => {
-  serverLogger.info("Welcome to application.");
+  appLogger.info("Welcome to application.");
   res.json({ message: "Welcome to application." });
 });
 
 const server = http.createServer(app);
-
 
 createTerminus(server, {
   healthChecks: {
@@ -70,13 +69,12 @@ createTerminus(server, {
   },
 });
 
-
 //server
 app.listen(PORT || 3000, function (err) {
   if (err) {
-    serverLogger.error("Error: Error in server setup");
+    appLogger.error("Error: Error in server setup");
     return;
   }
   swaggerDocs(app, PORT);
-  serverLogger.info(`Server listening on port: ${PORT}`);
+  appLogger.info(`Server listening on port: ${PORT}`);
 });

@@ -1,5 +1,5 @@
 const { logger } = require("../libs/logger.js");
-const utilLogger = logger("DateTimeUtils");
+const appLogger = logger("DateTimeUtils");
 
 function giveCurrentDateTime() {
   var dateTime = "";
@@ -14,10 +14,10 @@ function giveCurrentDateTime() {
     const time =
       today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     dateTime = date + "_" + time;
-    utilLogger.info(`datetime  :: ${dateTime}`);
+    appLogger.info(`datetime  :: ${dateTime}`);
     return dateTime;
   } catch (err) {
-    utilLogger.error(`error  :: ${err}`);
+    appLogger.error(`error  :: ${err}`);
     return "";
   }
 }

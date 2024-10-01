@@ -2,8 +2,7 @@ const firebase = require("../firebase/firebase.js");
 const bucket = firebase.bucket;
 const fs = require("fs");
 const { logger } = require("../libs/logger.js");
-const fileLogger = logger("Files");
-const dateTimeUtils = require("../utils/dateTimeUtils.js");
+const appLogger = logger("Files");
 const shortid = require("shortid");
 const message = require("../constants/message.js");
 const apiResponse = require("../response/apiResponse.js");
@@ -25,9 +24,9 @@ async function uploadImage(file, req) {
     }
 
     const userId = req.userId; // Extract the userId from the decoded token
-    fileLogger.info(`User ID: ${userId}`); // Log the userId for debugging
+    appLogger.info(`User ID: ${userId}`); // Log the userId for debugging
 
-    fileLogger.info(`Image file details: 
+    appLogger.info(`Image file details: 
       filename: ${file.filename}, 
       originalname: ${file.originalname}, 
       mimetype: ${file.mimetype}, 
@@ -92,14 +91,14 @@ async function uploadImage(file, req) {
     // Delete the local file after successful upload
     fs.unlink(file.path, (err) => {
       if (err) {
-        fileLogger.error(`Error deleting file: ${file.path}, Error: ${err}`);
+        appLogger.error(`Error deleting file: ${file.path}, Error: ${err}`);
         return apiResponse.failureJsonObject(
           serverCode.internalServerError,
           false,
           message.file_deletion_failed
         );
       }
-      fileLogger.info(`Local file deleted: ${file.path}`);
+      appLogger.info(`Local file deleted: ${file.path}`);
     });
 
     return url;
