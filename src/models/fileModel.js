@@ -1,5 +1,3 @@
-const userModel = require("./userModel");
-
 module.exports = (sequelize, DataTypes) => {
   const Files = sequelize.define(
     "Files",
@@ -12,13 +10,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       userId: {
         type: DataTypes.INTEGER,
-        userId: {
-          type: DataTypes.INTEGER,
-          references: {
-            model: userModel,
-            key: "userId",
-          },
+        references: {
+          model: "Users", // Use the string name of the Users model
+          key: "userId", // Foreign key that references User model
         },
+        allowNull: false,
       },
       fileType: {
         type: DataTypes.STRING,
@@ -31,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       module: {
         type: DataTypes.ENUM,
-        values: ["none","profile", "products"], // Define your ENUM values
+        values: ["none", "profile", "products"], // Define your ENUM values
         defaultValue: "none", // Optional default value
         allowNull: false,
       },
@@ -58,6 +54,11 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true, // Enables soft deletes with deletedAt
     }
   );
+
+  // Define relationships
+  Files.associate = (models) => {
+    Files.belongsTo(models.Users, { foreignKey: "userId" }); // Associate with User
+  };
 
   return Files;
 };

@@ -12,14 +12,10 @@ const {
   uploadBytesResumable,
 } = require("firebase/storage");
 const firebase = require("../firebase/firebase.js");
-const moment = require('moment');
+const moment = require("moment");
 const date = new Date();
 
-// create main Model
-// const Images = db.images;
-
 const User = db.user;
-
 
 // Initialize Cloud Storage and get a reference to the service
 const storage = getStorage();
@@ -91,7 +87,7 @@ const uploadImage = async (req, res) => {
     const fileBuffer = fs.readFileSync(filePath);
 
     // const dateTime = dateTimeUtils.giveCurrentDateTime();
-    const dateTime = moment(date).format('YYYY-MM-DD_HH:mm:ss'); 
+    const dateTime = moment(date).format("YYYY-MM-DD_HH:mm:ss");
     // const storageRef = ref(storage, `userId/images/${"Image_" + dateTime}`);
     const storageRef = ref(
       storage,
@@ -211,11 +207,11 @@ const uploadMultipleImage = async (req, res) => {
         path: ${file.path}`);
 
       // const dateTime = dateTimeUtils.giveCurrentDateTime();
-      const dateTime = moment(date).format('YYYY-MM-DD_HH:mm:ss'); 
+      const dateTime = moment(date).format("YYYY-MM-DD_HH:mm:ss");
       const folderName = "users/" + userId + "/images/";
       const fileName = "Image_" + dateTime + "_" + file.originalname;
       const blob = bucket.file(folderName + fileName);
-     
+
       const blobStream = blob.createWriteStream({
         metadata: {
           contentType: file.mimetype,
@@ -252,8 +248,6 @@ const uploadMultipleImage = async (req, res) => {
 
     const urls = await Promise.all(uploadPromises);
     appLogger.info(`DownloadUrl  :: ${urls}`);
-
-    
 
     return res
       .status(serverCode.ok)

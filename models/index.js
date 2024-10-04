@@ -31,7 +31,8 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.user = require("../src/models/userModel.js")(sequelize, DataTypes);
-db.images = require("../src/models/imagesModel.js")(sequelize, DataTypes);
+db.file = require("../src/models/fileModel.js")(sequelize, DataTypes);
+db.verify = require("../src/models/verifyModel.js")(sequelize, DataTypes);
 
 db.sequelize
   .sync({ force: false })

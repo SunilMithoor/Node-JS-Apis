@@ -8,10 +8,10 @@ const message = require("../constants/message.js");
 const apiResponse = require("../response/apiResponse.js");
 const serverCode = require("../response/serverCode.js");
 const db = require("../../models/index.js");
-const moment = require('moment');
+const moment = require("moment");
 const date = new Date();
 
-const Images = db.images;
+const Files = db.file;
 
 async function uploadImage(file, req) {
   try {
@@ -46,7 +46,7 @@ async function uploadImage(file, req) {
     }
     const fileType = file.mimetype;
     // const dateTime = dateTimeUtils.giveCurrentDateTime();
-    const dateTime = moment(date).format('YYYY-MM-DD_HH:mm:ss'); 
+    const dateTime = moment(date).format("YYYY-MM-DD_HH:mm:ss");
     const folderName = `users/` + userId + `/images/`;
     const fileName = `${"Image_" + dateTime}${
       "_" + shortid.generate()
@@ -71,7 +71,7 @@ async function uploadImage(file, req) {
     });
 
     // Insert the new files into the Files table
-    const fileRecord = await Images.create({
+    const fileRecord = await Files.create({
       userId: userId,
       name: fileName,
       fileType: fileType,
